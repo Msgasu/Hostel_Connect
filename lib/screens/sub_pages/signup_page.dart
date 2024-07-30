@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:final_project/screens/main_pages/homepage.dart';
-import 'login_page.dart'; // Import the LoginPage
+import 'login_page.dart'; 
 
 class SignUpPage extends StatelessWidget {
   @override
