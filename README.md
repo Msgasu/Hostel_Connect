@@ -1,7 +1,11 @@
-# final_project
+# Hostel_Connect
 
-A new Flutter project.
-
+A students companion to finding hostels offcampus (Ashesi University).
+Allows students to :
+Search or look through availabale hostels
+Book hostel rooms
+Make payments
+Contact hostel owners
 ## Getting Started
 
 This project is a starting point for a Flutter application.
