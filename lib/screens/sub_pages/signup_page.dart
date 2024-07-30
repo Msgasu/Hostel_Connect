@@ -1,269 +1,379 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:final_project/screens/sub_pages/login_page.dart';
+import 'package:final_project/services/auth_service.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:final_project/screens/main_pages/homepage.dart';
-import 'login_page.dart'; 
+import 'package:google_fonts/google_fonts.dart';
 
 class SignUpPage extends StatelessWidget {
+  SignUpPage({super.key});
+
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _genderController = TextEditingController(); // Gender controller
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _contactController = TextEditingController(); // Contact controller
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController(); // Confirm password controller
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true,
+      bottomNavigationBar: _signin(context),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        toolbarHeight: 50,
+      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                    height: MediaQuery.of(context).size.height *
-                        0.05), // 5% of available free space
-
-                // Create Account text (centered)
-                Center(
-                  child: Text(
-                    'Create Account',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w600, fontSize: 40),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-
-                SizedBox(height: 16),
-
-                // Prompt (Register to get started)
-                Center(
-                  child: Text(
-                    'Register to get started',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-
-                SizedBox(height: 32),
-
-                // Sign up form
-                Theme(
-                  data: ThemeData(
-                    inputDecorationTheme: InputDecorationTheme(
-                      filled: true,
-                      fillColor: Color(0xFFFBFBFB),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14.0),
-                        borderSide: BorderSide(color: Color(0xFFF3F3F3)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14.0),
-                        borderSide: BorderSide(color: Color(0xFFF2994A)),
-                      ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Column(
+            children: [
+              Center(
+                child: Text(
+                  'Register Account',
+                  style: GoogleFonts.raleway(
+                    textStyle: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 32,
                     ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // First and Last Name Fields (side by side)
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'First Name',
-                                  style: TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 8),
-                                TextFormField(
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter your First Name',
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter your first name';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Last Name',
-                                  style: TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 8),
-                                TextFormField(
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter your Last Name',
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter your last name';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: 24),
-
-                      // Email Field
-                      Text(
-                        'Email',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          hintText: 'Enter your Email',
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          return null;
-                        },
-                      ),
-
-                      SizedBox(height: 24),
-
-                      // Contact Field
-                      Text(
-                        'Contact Number',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          hintText: 'Enter your Contact Number',
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your contact number';
-                          }
-                          return null;
-                        },
-                      ),
-
-                      SizedBox(height: 24),
-
-                      // Password Field
-                      Text(
-                        'Password',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          hintText: 'Enter your password',
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.visibility),
-                            onPressed: () {
-                              // Implement show/hide password functionality
-                            },
-                          ),
-                        ),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
-                          }
-                          return null;
-                        },
-                      ),
-
-                      SizedBox(height: 24),
-
-                      // Confirm Password Field
-                      Text(
-                        'Confirm Password',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          hintText: 'Confirm your password',
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.visibility),
-                            onPressed: () {
-                              // Implement show/hide password functionality
-                            },
-                          ),
-                        ),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please confirm your password';
-                          }
-                          return null;
-                        },
-                      ),
-
-                      SizedBox(height: 16),
-
-                      // Sign Up button
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.popUntil(context, ModalRoute.withName('/login'));
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color.fromARGB(255, 114, 23, 23), // Wine color for the button
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 40, vertical: 15), // Adjust button padding
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(35.0), // Set button border radius
-                              side: BorderSide(
-                                  color: Color.fromARGB(255, 185, 179, 196),
-                                  width: 2), // Add border side
-                            ),
-                            elevation: 5, // Add elevation for shadow effect
-                            shadowColor: Colors.grey, // Set shadow color
-                            minimumSize: Size(200, 50), // Set minimum width and height
-                          ),
-                          child: Text(
-                            'Sign Up',
-                            style: TextStyle(fontSize: 18, color: Colors.white), // Increase font size and change text color
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 16),
-
-                      // Already have an account? Login text
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("Already have an account? "),
-                          InkWell(
-                            onTap: () {
-                              ;
-                            },
-                            child: Text(
-                              'Log in',
-                              style: TextStyle(
-                                color: Colors.blue,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
                 ),
-              ],
+              ),
+              const SizedBox(height: 20),
+              _firstName(),
+              const SizedBox(height: 16),
+              _lastName(),
+              const SizedBox(height: 16),
+              _gender(),
+              const SizedBox(height: 16),
+              _emailAddress(),
+              const SizedBox(height: 16),
+              _contactNumber(),
+              const SizedBox(height: 20),
+              _password(),
+              const SizedBox(height: 20),
+              _confirmPassword(),
+              const SizedBox(height: 50),
+              _signup(context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _firstName() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'First Name',
+          style: GoogleFonts.raleway(
+            textStyle: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
             ),
           ),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _firstNameController,
+          decoration: InputDecoration(
+            filled: true,
+            hintText: 'John',
+            hintStyle: const TextStyle(
+              color: Color(0xff6A6A6A),
+              fontWeight: FontWeight.normal,
+              fontSize: 14,
+            ),
+            fillColor: const Color(0xffF7F7F9),
+            border: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _lastName() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Last Name',
+          style: GoogleFonts.raleway(
+            textStyle: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _lastNameController,
+          decoration: InputDecoration(
+            filled: true,
+            hintText: 'Doe',
+            hintStyle: const TextStyle(
+              color: Color(0xff6A6A6A),
+              fontWeight: FontWeight.normal,
+              fontSize: 14,
+            ),
+            fillColor: const Color(0xffF7F7F9),
+            border: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _gender() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Gender',
+          style: GoogleFonts.raleway(
+            textStyle: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _genderController,
+          decoration: InputDecoration(
+            filled: true,
+            hintText: 'Male/Female/Other',
+            hintStyle: const TextStyle(
+              color: Color(0xff6A6A6A),
+              fontWeight: FontWeight.normal,
+              fontSize: 14,
+            ),
+            fillColor: const Color(0xffF7F7F9),
+            border: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _emailAddress() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Email Address',
+          style: GoogleFonts.raleway(
+            textStyle: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _emailController,
+          decoration: InputDecoration(
+            filled: true,
+            hintText: 'mahdiforwork@gmail.com',
+            hintStyle: const TextStyle(
+              color: Color(0xff6A6A6A),
+              fontWeight: FontWeight.normal,
+              fontSize: 14,
+            ),
+            fillColor: const Color(0xffF7F7F9),
+            border: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _contactNumber() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Contact Number',
+          style: GoogleFonts.raleway(
+            textStyle: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _contactController,
+          decoration: InputDecoration(
+            filled: true,
+            hintText: '+1234567890',
+            hintStyle: const TextStyle(
+              color: Color(0xff6A6A6A),
+              fontWeight: FontWeight.normal,
+              fontSize: 14,
+            ),
+            fillColor: const Color(0xffF7F7F9),
+            border: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _password() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Password',
+          style: GoogleFonts.raleway(
+            textStyle: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _passwordController,
+          obscureText: true,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: const Color(0xffF7F7F9),
+            border: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _confirmPassword() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Confirm Password',
+          style: GoogleFonts.raleway(
+            textStyle: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _confirmPasswordController,
+          obscureText: true,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: const Color(0xffF7F7F9),
+            border: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _signup(BuildContext context) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xff0D6EFD),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+        minimumSize: const Size(double.infinity, 60),
+        elevation: 0,
+      ),
+      onPressed: () async {
+        if (_passwordController.text == _confirmPasswordController.text) {
+          // await AuthService().signup(
+          //   email: _emailController.text,
+          //   password: _passwordController.text,
+          //   context: context,
+          //   firstName: _firstNameController.text,
+          //   lastName: _lastNameController.text,
+          //   gender: _genderController.text,
+          //   contact: _contactController.text,
+          // );
+        } else {
+          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Passwords do not match')),
+          );
+        }
+      },
+      child: const Text("Sign Up"),
+    );
+  }
+
+  Widget _signin(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: RichText(
+        textAlign: TextAlign.center,
+        text: TextSpan(
+          children: [
+            const TextSpan(
+              text: "Already Have Account? ",
+              style: TextStyle(
+                color: Color(0xff6A6A6A),
+                fontWeight: FontWeight.normal,
+                fontSize: 16,
+              ),
+            ),
+            TextSpan(
+              text: "Log In",
+              style: const TextStyle(
+                color: Color(0xff1A1D1E),
+                fontWeight: FontWeight.normal,
+                fontSize: 16,
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginPage(),
+                    ),
+                  );
+                },
+            ),
+          ],
         ),
       ),
     );
