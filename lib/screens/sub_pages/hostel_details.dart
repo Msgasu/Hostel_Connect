@@ -1,9 +1,9 @@
-import 'package:final_project/models/room_model.dart';
-import 'package:final_project/screens/sub_pages/room_details.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:final_project/models/room_model.dart';
+import 'package:final_project/screens/sub_pages/room_details.dart';
 import 'package:final_project/models/hostel_model.dart';
-
 
 class HostelDetailPage extends StatelessWidget {
   final Hostel hostel;
@@ -117,12 +117,15 @@ class HostelDetailPage extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 20),
-                  Text(
-                    'Hostel Manager',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ExpansionTile(
+                    title: Text(
+                      'Hostel Manager',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    children: [
+                      _buildManagerDetails(),
+                    ],
                   ),
-                  SizedBox(height: 10),
-                  _buildManagerDetails(),
                 ],
               ),
             ),
