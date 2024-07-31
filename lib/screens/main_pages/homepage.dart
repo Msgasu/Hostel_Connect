@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:final_project/providers/hostel_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:final_project/providers/hostel_provider.dart';
+import 'package:final_project/screens/sub_pages/hostel_details.dart';
 import 'package:final_project/screens/main_pages/wishlist.dart';
 import 'package:final_project/screens/sub_pages/profile.dart';
 import 'package:final_project/widgets/custom_navigation_bar.dart';
-import 'package:final_project/screens/sub_pages/hostel_details.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -28,6 +28,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _currentIndex = index;
     });
+    // Navigate to the corresponding page based on the selected index
     switch (index) {
       case 0:
         Navigator.pushReplacement(
@@ -55,21 +56,18 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Image
-          Positioned.fill(
-            child: Image.asset(
-              'assets/home_back.jpg', // Replace with your background image asset
-              fit: BoxFit.cover,
-            ),
-          ),
-          // Foreground Content
+          // Positioned.fill(
+          //   // child: Image.asset(
+          //   //   // 'assets/home_back.jpg', // Replace with your background image asset
+          //   //   fit: BoxFit.cover,
+          //   // ),
+          // ),
           Consumer<HostelProvider>(
             builder: (context, provider, child) {
               final hostels = provider.hostels;
 
               return CustomScrollView(
                 slivers: [
-                  // Top Section
                   SliverAppBar(
                     expandedHeight: 200,
                     flexibleSpace: Stack(
@@ -115,7 +113,6 @@ class _HomePageState extends State<HomePage> {
                     backgroundColor: Colors.transparent,
                     elevation: 0,
                   ),
-                  // Hostels List
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -126,7 +123,7 @@ class _HomePageState extends State<HomePage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => HostelDetailPage(
-                                  hostel: hostel, // Pass Hostel object
+                                  hostelId: hostel.id, // Ensure Hostel has an id
                                 ),
                               ),
                             );
@@ -136,7 +133,7 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(15.0),
                             ),
                             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                            elevation: 5, // Add shadow for better visibility
+                            elevation: 5,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -187,11 +184,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildImage(String imageUrl) {
-    return Image.network(
-      imageUrl,
-      height: 200,
-      width: double.infinity,
-      fit: BoxFit.cover,
-    );
+    return imageUrl.isNotEmpty
+        ? Image.network(
+            imageUrl,
+            height: 200,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          )
+        : Container(
+            height: 200,
+            width: double.infinity,
+            color: Colors.grey,
+            child: Center(
+              child: Text(
+                'No Image',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          );
   }
 }

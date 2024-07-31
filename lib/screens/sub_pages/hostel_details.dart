@@ -1,137 +1,155 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:final_project/models/hostel_model.dart';
 import 'package:final_project/models/room_model.dart';
 import 'package:final_project/screens/sub_pages/room_details.dart';
-import 'package:final_project/models/hostel_model.dart';
 
 class HostelDetailPage extends StatelessWidget {
-  final Hostel hostel;
+  final String hostelId;
 
-  HostelDetailPage({required this.hostel});
+  HostelDetailPage({required this.hostelId});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.favorite_border, color: Colors.black),
-            onPressed: () {},
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance.collection('hostels').doc(hostelId).get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+            body: Center(child: CircularProgressIndicator()),
+          );
+        } else if (snapshot.hasError) {
+          return Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+            body: Center(child: Text('Error: ${snapshot.error}')),
+          );
+        } else if (!snapshot.hasData || !snapshot.data!.exists) {
+          return Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+            body: Center(child: Text('Hostel not found')),
+          );
+        }
+
+        final hostel = Hostel.fromFirestore(snapshot.data!);
+
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.favorite_border, color: Colors.black),
+                onPressed: () {},
+              ),
+            ],
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.network(
-                  hostel.imageUrl,
-                  height: 300,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+                Stack(
+                  children: [
+                    Image.network(
+                      hostel.imageUrl,
+                      height: 300,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        hostel.name,
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        hostel.description,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(height: 20),
+                      FutureBuilder<QuerySnapshot>(
+                        future: FirebaseFirestore.instance
+                            .collection('hostels')
+                            .doc(hostelId)
+                            .collection('room_types')  // Corrected path
+                            .get(),
+                        builder: (context, roomSnapshot) {
+                          if (roomSnapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (roomSnapshot.hasError) {
+                            return Center(child: Text('Error: ${roomSnapshot.error}'));
+                          } else if (!roomSnapshot.hasData || roomSnapshot.data!.docs.isEmpty) {
+                            return Center(child: Text('No rooms found'));
+                          }
+
+                          final rooms = roomSnapshot.data!.docs;
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: rooms.map((roomDoc) {
+                              final room = Room.fromFirestore(roomDoc);
+                              return _buildRoomTypeIcon(
+                                context,
+                                Icons.single_bed, // Example icon; adjust as needed
+                                room.type, // Assuming 'type' or similar property exists
+                                RoomDetailPage(
+                                  roomId: roomDoc.id, 
+                                  hostelId: hostelId,  // Pass hostelId to RoomDetailPage
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      ExpansionTile(
+                        title: Text(
+                          'Hostel Manager',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        children: [
+                          _buildManagerDetails(hostel),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    hostel.name,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    hostel.description,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildRoomTypeIcon(
-                        context,
-                        Icons.single_bed,
-                        '1 in a Room',
-                        RoomDetailPage(
-                          room: Room(
-                            type: '1 in a Room',
-                            description: 'A single room with basic amenities.',
-                            imageUrls: [
-                              'https://example.com/1_in_a_room_1.jpg',
-                              'https://example.com/1_in_a_room_2.jpg',
-                            ],
-                            isFull: false,
-                            occupants: ['John Doe'],
-                            gender: 'male',
-                          ),
-                          userGender: 'male',
-                        ),
-                      ),
-                      _buildRoomTypeIcon(
-                        context,
-                        Icons.hotel,
-                        '2 in a Room',
-                        RoomDetailPage(
-                          room: Room(
-                            type: '2 in a Room',
-                            description: 'A room with two beds.',
-                            imageUrls: [
-                              'https://example.com/2_in_a_room_1.jpg',
-                            ],
-                            isFull: true,
-                            occupants: ['Alice Johnson'],
-                            gender: 'female',
-                          ),
-                          userGender: 'female',
-                        ),
-                      ),
-                      _buildRoomTypeIcon(
-                        context,
-                        Icons.group,
-                        '3 in a Room',
-                        RoomDetailPage(
-                          room: Room(
-                            type: '3 in a Room',
-                            description: 'A spacious room for three people.',
-                            imageUrls: [
-                              'https://example.com/3_in_a_room_1.jpg',
-                            ],
-                            isFull: false,
-                            occupants: ['Bob Smith'],
-                            gender: 'male',
-                          ),
-                          userGender: 'male',
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  ExpansionTile(
-                    title: Text(
-                      'Hostel Manager',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    children: [
-                      _buildManagerDetails(),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -154,7 +172,7 @@ class HostelDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildManagerDetails() {
+  Widget _buildManagerDetails(Hostel hostel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

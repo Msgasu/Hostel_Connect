@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Hostel {
+  final String id; // Add this field
   final String name;
   final String imageUrl;
   final String price;
@@ -8,9 +9,9 @@ class Hostel {
   final String managerName;
   final String managerContact;
   final String managerEmail;
-  
 
   Hostel({
+    required this.id, // Include id in the constructor
     required this.name,
     required this.imageUrl,
     required this.price,
@@ -24,6 +25,7 @@ class Hostel {
   factory Hostel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return Hostel(
+      id: doc.id, // Assign the document ID to the id field
       name: data['name'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
       price: data['price'] ?? '',
