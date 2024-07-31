@@ -1,26 +1,31 @@
 import 'package:final_project/screens/main_pages/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
+import 'package:provider/provider.dart';
+import 'package:final_project/providers/hostel_provider.dart';
+import 'package:final_project/screens/main_pages/homepage.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Ensure that Flutter is initialized before calling async code
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+  WidgetsFlutterBinding.ensureInitialized(); // Ensure bindings are initialized
+  await Firebase.initializeApp(); // Initialize Firebase
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => HostelProvider(),
+      child: MyApp(),
+    ),
   );
-  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MyApp',
+      title: 'Hostel Finder',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: SplashScreen(),
-      debugShowCheckedModeBanner: false, // Remove debug banner
+      debugShowCheckedModeBanner: false,
     );
   }
 }

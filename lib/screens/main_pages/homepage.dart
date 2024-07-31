@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:final_project/providers/hostel_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:final_project/widgets/custom_navigation_bar.dart';
-import 'package:final_project/screens/sub_pages/hostel_details.dart';
+import 'package:provider/provider.dart';
 import 'package:final_project/screens/main_pages/wishlist.dart';
 import 'package:final_project/screens/sub_pages/profile.dart';
+import 'package:final_project/widgets/custom_navigation_bar.dart';
+import 'package:final_project/screens/sub_pages/hostel_details.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,38 +15,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
-  final List<Map<String, String>> hostels = [
-    {
-      'name': 'Old Hosanna',
-      'image': 'assets/old_hosanna.jpg',
-      'price': '5500-6000',
-      'room': '2 in a room and 3 in a room',
-    },
-    {
-      'name': 'Colombiana',
-      'image': 'assets/colombiana.jpg',
-      'price': '5000-6000',
-      'room': '1 in a room and 2 in a room',
-    },
-    {
-      'name': 'Charlotte Courts',
-      'image': 'assets/charlotte_courts.jpg',
-      'price': '5000-6000',
-      'room': '1 in a room and 2 in a room',
-    },
-    {
-      'name': 'Old Masere',
-      'image': 'assets/old_masere.jpg',
-      'price': '5000-6000',
-      'room': '1 in a room, 2 in a room and 3 in a room',
-    },
-    {
-      'name': 'Dufie Platinum',
-      'image': 'assets/Dufie_Platinum.jpg',
-      'price': '5000-6000',
-      'room': '1 in a room, 2 in a room and 3 in a room',
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Fetch hostels when the widget is initialized
+    Future.microtask(() {
+      Provider.of<HostelProvider>(context, listen: false).fetchHostels();
+    });
+  }
 
   void _onTabTapped(int index) {
     setState(() {
@@ -74,125 +53,129 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          // Top Section
-          SliverAppBar(
-            expandedHeight: 200,
-            flexibleSpace: Stack(
-              children: [
-                Positioned.fill(
-                  child: Image.asset(
-                    'assets/welcome.jpg', // Replace with your top background image
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Container(
-                  color: Colors.black.withOpacity(0.5), // Semi-transparent overlay
-                ),
-                Positioned(
-                  bottom: 20,
-                  left: 20,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Welcome to Hostel Finder!',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Find the best hostels near you.',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+      body: Stack(
+        children: [
+          // Background Image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/home_back.jpg', // Replace with your background image asset
+              fit: BoxFit.cover,
             ),
-            floating: false,
-            pinned: true,
-            backgroundColor: Colors.transparent,
-            elevation: 0,
           ),
-          // Hostels List
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HostelDetailPage(
-                          hostel: hostels[index],
-                        ),
-                      ),
-                    );
-                  },
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    margin: EdgeInsets.symmetric(vertical: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          // Foreground Content
+          Consumer<HostelProvider>(
+            builder: (context, provider, child) {
+              final hostels = provider.hostels;
+
+              return CustomScrollView(
+                slivers: [
+                  // Top Section
+                  SliverAppBar(
+                    expandedHeight: 200,
+                    flexibleSpace: Stack(
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(15.0),
-                            topRight: Radius.circular(15.0),
+                        Positioned.fill(
+                          child: Image.asset(
+                            'assets/welcome.jpg',
+                            fit: BoxFit.cover,
                           ),
-                          child: _buildImage(hostels[index]['image']!),
                         ),
-                        Padding(
-                          padding: EdgeInsets.all(10),
+                        Container(
+                          color: Colors.black.withOpacity(0.5),
+                        ),
+                        Positioned(
+                          bottom: 20,
+                          left: 20,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    hostels[index]['name']!,
-                                    style: TextStyle(
-                                        fontSize: 20, fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 5),
                               Text(
-                                hostels[index]['price']!,
+                                'Welcome to Hostel Finder!',
                                 style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w600),
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              Row(
-                                children: [
-                                  SizedBox(width: 5),
-                                  Text(
-                                    hostels[index]['room']!,
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                  SizedBox(width: 5),
-                                ],
+                              SizedBox(height: 8),
+                              Text(
+                                'Find the best hostels near you.',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
+                    floating: false,
+                    pinned: true,
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
                   ),
-                );
-              },
-              childCount: hostels.length,
-            ),
+                  // Hostels List
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final hostel = hostels[index];
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HostelDetailPage(
+                                  hostel: hostel, // Pass Hostel object
+                                ),
+                              ),
+                            );
+                          },
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                            elevation: 5, // Add shadow for better visibility
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(15.0),
+                                    topRight: Radius.circular(15.0),
+                                  ),
+                                  child: _buildImage(hostel.imageUrl),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        hostel.name,
+                                        style: TextStyle(
+                                            fontSize: 20, fontWeight: FontWeight.bold),
+                                      ),
+                                      SizedBox(height: 5),
+                                      Text(
+                                        hostel.description,
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      childCount: hostels.length,
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -203,9 +186,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildImage(String imagePath) {
-    return Image.asset(
-      imagePath,
+  Widget _buildImage(String imageUrl) {
+    return Image.network(
+      imageUrl,
       height: 200,
       width: double.infinity,
       fit: BoxFit.cover,
