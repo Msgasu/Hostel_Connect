@@ -20,12 +20,13 @@ dependencies:
   firebase_core: ^2.24.2
   firebase_auth: ^4.16.0
   cloud_firestore: ^4.14.0
-  # fluttertoast: ^8.2.5
+  # fluttertoast:  ^9.0.0
   google_fonts: ^6.2.1
   provider: ^6.1.2
   url_launcher: ^6.3.0
   firebase_messaging: ^14.9.4
   flutter_phone_direct_caller: ^2.1.1
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
@@ -45,6 +46,7 @@ flutter:
     - assets/Dufie_Platinum.jpg
     - assets/splash.jpg
     - assets/home_back.jpg
+    - assets/Nothing_Here_Yet.jpg
 
 flutter_native_splash:
   background_image: assets/splash.jpg 

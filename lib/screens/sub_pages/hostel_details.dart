@@ -5,6 +5,7 @@ import 'package:final_project/models/hostel_model.dart';
 import 'package:final_project/models/room_model.dart';
 import 'package:final_project/screens/sub_pages/room_details.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart'; // Import phone caller package
+import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts package
 
 class HostelDetailPage extends StatelessWidget {
   final String hostelId;
@@ -92,19 +93,19 @@ class HostelDetailPage extends StatelessWidget {
                     children: [
                       Text(
                         hostel.name,
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.lato(fontSize: 24, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 20),
                       Text(
                         hostel.description,
-                        style: TextStyle(fontSize: 16),
+                        style: GoogleFonts.lato(fontSize: 16),
                       ),
                       SizedBox(height: 20),
                       FutureBuilder<QuerySnapshot>(
                         future: FirebaseFirestore.instance
                             .collection('hostels')
                             .doc(hostelId)
-                            .collection('room_types')  // Corrected path
+                            .collection('room_types')
                             .get(),
                         builder: (context, roomSnapshot) {
                           if (roomSnapshot.connectionState == ConnectionState.waiting) {
@@ -116,20 +117,12 @@ class HostelDetailPage extends StatelessWidget {
                           }
 
                           final rooms = roomSnapshot.data!.docs;
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: rooms.map((roomDoc) {
-                              final room = Room.fromFirestore(roomDoc);
-                              return _buildRoomTypeIcon(
-                                context,
-                                Icons.single_bed, // Example icon; adjust as needed
-                                room.type, // Assuming 'type' or similar property exists
-                                RoomDetailPage(
-                                  roomId: roomDoc.id, 
-                                  hostelId: hostelId,  // Pass hostelId to RoomDetailPage
-                                ),
-                              );
-                            }).toList(),
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: RoomTypeIcons(
+                              rooms: rooms,
+                              hostelId: hostelId,
+                            ),
                           );
                         },
                       ),
@@ -137,7 +130,7 @@ class HostelDetailPage extends StatelessWidget {
                       ExpansionTile(
                         title: Text(
                           'Hostel Manager',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.lato(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         children: [
                           _buildManagerDetails(hostel),
@@ -151,25 +144,6 @@ class HostelDetailPage extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildRoomTypeIcon(
-      BuildContext context, IconData icon, String label, Widget page) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => page),
-        );
-      },
-      child: Column(
-        children: [
-          Icon(icon, size: 40),
-          SizedBox(height: 8),
-          Text(label),
-        ],
-      ),
     );
   }
 
@@ -193,9 +167,9 @@ class HostelDetailPage extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          Icon(icon, size: 40),
+          Icon(icon, size: 40, color: Color.fromARGB(255, 172, 73, 33)), // Icon color
           SizedBox(width: 16),
-          Expanded(child: Text(text, style: TextStyle(fontSize: 16))),
+          Expanded(child: Text(text, style: GoogleFonts.lato(fontSize: 16))),
         ],
       ),
     );
@@ -224,5 +198,68 @@ class HostelDetailPage extends StatelessWidget {
     } catch (e) {
       print('Error launching $email: $e');
     }
+  }
+}
+
+class RoomTypeIcons extends StatelessWidget {
+  final List<QueryDocumentSnapshot> rooms;
+  final String hostelId;
+
+  RoomTypeIcons({
+    required this.rooms,
+    required this.hostelId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 16.0, // Horizontal spacing between icons
+      runSpacing: 16.0, // Vertical spacing between rows
+      children: rooms.map((roomDoc) {
+        final room = Room.fromFirestore(roomDoc);
+        return RoomTypeIcon(
+          icon: Icons.single_bed, // Example icon; adjust as needed
+          label: room.type, // Assuming 'type' or similar property exists
+          page: RoomDetailPage(
+            roomId: roomDoc.id, 
+            hostelId: hostelId,  // Pass hostelId to RoomDetailPage
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class RoomTypeIcon extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Widget page;
+
+  RoomTypeIcon({
+    required this.icon,
+    required this.label,
+    required this.page,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => page),
+        );
+      },
+      child: Column(
+        children: [
+          Icon(icon, size: 40, color: Color.fromARGB(255, 172, 73, 33)), // Icon color
+          SizedBox(height: 8),
+          Text(
+            label,
+            style: GoogleFonts.lato(fontSize: 14),
+          ),
+        ],
+      ),
+    );
   }
 }
