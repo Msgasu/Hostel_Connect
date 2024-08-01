@@ -203,7 +203,7 @@ class _SignUpPageState extends State<SignUpPage> {
               borderRadius: BorderRadius.circular(14),
             ),
           ),
-          items: <String>['Male', 'Female', 'Other'].map((String value) {
+          items: <String>['Male', 'Female'].map((String value) {
             return DropdownMenuItem<String>(
               value: value,
               child: Text(value),

@@ -1,35 +1,39 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Room {
-  final String description;
-  final int empty;
-  final int full;
-  final String id;
-  final List<String> imageUrls;
   final int numRooms;
+  final List<int> bookedRooms;
+  final List<String> imageUrls;
+  final String description;
+  final String id;
   final String type;
+  final int full;
+  final int empty;
 
   Room({
-    required this.description,
-    required this.empty,
-    required this.full,
-    required this.id,
-    required this.imageUrls,
     required this.numRooms,
+    required this.bookedRooms,
+    required this.imageUrls,
+    required this.description,
+    required this.id,
     required this.type,
+    required this.full,
+    required this.empty,
   });
 
-  // Factory constructor to create a Room instance from a Firestore document
   factory Room.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+    print("Firestore Data: $data"); // Debug print
+
     return Room(
-      description: data['description'] ?? '',
-      empty: (data['empty'] as int?) ?? 0,
-      full: (data['full'] as int?) ?? 0,
-      id: data['id'] ?? '',
+      numRooms: data['num_rooms'] ?? 0,
+      bookedRooms: List<int>.from(data['bookedRrooms'] ?? []),
       imageUrls: List<String>.from(data['imageUrls'] ?? []),
-      numRooms: (data['num_rooms'] as int?) ?? 0,
+      description: data['description'] ?? '',
+      id: data['id'] ?? '',
       type: data['type'] ?? '',
+      full: data['full'] ?? 0,
+      empty: data['empty'] ?? 0,
     );
   }
 }

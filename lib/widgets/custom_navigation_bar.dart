@@ -38,10 +38,16 @@ class CustomBottomNavBar extends StatelessWidget {
               backgroundColor: Colors.transparent,
             ),
             BottomNavigationBarItem(
+              icon: Icon(Icons.bookmark, size: 28),
+              label: 'Booked Rooms',
+              backgroundColor: Colors.transparent,
+            ),
+            BottomNavigationBarItem(
               icon: Icon(Icons.person, size: 28),
               label: 'Profile',
               backgroundColor: Colors.transparent,
             ),
+
           ],
           selectedItemColor: Color.fromARGB(255, 172, 73, 33),
           unselectedItemColor: Colors.grey,

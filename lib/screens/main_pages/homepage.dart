@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:final_project/screens/main_pages/booked_rooms.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:final_project/providers/hostel_provider.dart';
@@ -24,32 +25,40 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-    // Navigate to the corresponding page based on the selected index
-    switch (index) {
-      case 0:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
-        break;
-      case 1:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => WishlistPage()),
-        );
-        break;
-      case 2:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => ProfilePage()),
-        );
-        break;
-    }
+void _onTabTapped(int index) {
+  setState(() {
+    _currentIndex = index;
+  });
+  // Navigate to the corresponding page based on the selected index
+  switch (index) {
+    case 0:
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+      break;
+    case 1:
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => WishlistPage()),
+      );
+      break;
+    case 2:
+      Navigator.pushReplacement(
+        context,
+         MaterialPageRoute(builder: (context) => BookedRoomsPage()), 
+      );
+      break;
+    case 3: // New case for Booked Rooms
+      Navigator.pushReplacement(
+        context,  
+        MaterialPageRoute(builder: (context) => ProfilePage()),
+       // Ensure you have BookedRoomsPage
+      );
+      break;
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

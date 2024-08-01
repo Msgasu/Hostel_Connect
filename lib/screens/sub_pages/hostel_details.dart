@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:final_project/models/hostel_model.dart';
 import 'package:final_project/models/room_model.dart';
 import 'package:final_project/screens/sub_pages/room_details.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart'; // Import phone caller package
 
 class HostelDetailPage extends StatelessWidget {
   final String hostelId;
@@ -201,19 +202,10 @@ class HostelDetailPage extends StatelessWidget {
   }
 
   void _launchCaller(String phoneNumber) async {
-    final Uri launchUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
-
     try {
-      if (await canLaunchUrl(launchUri)) {
-        await launchUrl(launchUri);
-      } else {
-        print('Could not launch $phoneNumber');
-      }
+      await FlutterPhoneDirectCaller.callNumber(phoneNumber);
     } catch (e) {
-      print('Error launching $phoneNumber: $e');
+      print('Error launching phone call: $e');
     }
   }
 

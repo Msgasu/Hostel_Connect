@@ -1,16 +1,20 @@
+import 'package:final_project/providers/hostel_provider.dart';
 import 'package:final_project/screens/main_pages/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
 import 'package:provider/provider.dart';
-import 'package:final_project/providers/hostel_provider.dart';
-import 'package:final_project/screens/main_pages/homepage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure bindings are initialized
   await Firebase.initializeApp(); // Initialize Firebase
+
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => HostelProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => HostelProvider(),
+        ),
+      ],
       child: MyApp(),
     ),
   );
@@ -24,7 +28,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: SplashScreen(),
+      home: SplashScreen(), // Initial screen
       debugShowCheckedModeBanner: false,
     );
   }

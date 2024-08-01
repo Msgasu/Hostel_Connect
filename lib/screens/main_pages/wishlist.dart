@@ -1,3 +1,4 @@
+import 'package:final_project/screens/main_pages/booked_rooms.dart';
 import 'package:final_project/screens/main_pages/homepage.dart';
 import 'package:final_project/screens/sub_pages/profile.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,9 @@ class _WishlistPageState extends State<WishlistPage> {
           case 1:
             return WishlistPage();
           case 2:
-            return ProfilePage();
+             return BookedRoomsPage();
+          case 3:
+              return ProfilePage();
           default:
             return HomePage();
         }

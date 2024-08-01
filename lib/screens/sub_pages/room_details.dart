@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:final_project/models/room_model.dart';
+import 'package:final_project/screens/sub_pages/book_room.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RoomDetailPage extends StatelessWidget {
   final String roomId;
@@ -11,75 +13,72 @@ class RoomDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Room>(
-      future: _fetchRoom(roomId),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Room Details'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Room Details'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // Trigger the FutureBuilder to refresh
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => RoomDetailPage(roomId: roomId, hostelId: hostelId),
             ),
-            body: Center(child: CircularProgressIndicator()),
           );
-        } else if (snapshot.hasError) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Room Details'),
-            ),
-            body: Center(child: Text('Error: ${snapshot.error}')),
-          );
-        } else if (!snapshot.hasData) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Room Details'),
-            ),
-            body: Center(child: Text('No room data available')),
-          );
-        }
+        },
+        child: FutureBuilder<Room>(
+          future: _fetchRoom(roomId),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData) {
+              return Center(child: Text('No room data available'));
+            }
 
-        final room = snapshot.data!;
+            final room = snapshot.data!;
+            final totalRooms = room.numRooms;
+            final bookedRoomsCount = room.full; // Number of booked rooms
+            final availableRooms = totalRooms - bookedRoomsCount;
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(room.type),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildImageCarousel(room),
-                SizedBox(height: 20),
-                _buildRoomCount(room),
-                SizedBox(height: 20),
-                _buildRoomWidgets(context, room),
-              ],
-            ),
-          ),
-        );
-      },
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildImageCarousel(room),
+                  SizedBox(height: 20),
+                  _buildRoomCount(totalRooms, availableRooms),
+                  SizedBox(height: 20),
+                  _buildRoomWidgets(context, room),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 
   Future<Room> _fetchRoom(String roomId) async {
     final doc = await FirebaseFirestore.instance
         .collection('hostels')
-        .doc(hostelId) // Replace with actual hostel ID
+        .doc(hostelId)
         .collection('room_types')
         .doc(roomId)
         .get();
 
-    return Room.fromFirestore(doc);
+    final room = Room.fromFirestore(doc);
+    return room;
   }
 
-
-// control carousel
   Widget _buildImageCarousel(Room room) {
     return CarouselSlider(
       options: CarouselOptions(
@@ -102,10 +101,7 @@ class RoomDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRoomCount(Room room) {
-    int totalRooms = room.numRooms;
-    int availableRooms = room.empty;
-
+  Widget _buildRoomCount(int totalRooms, int availableRooms) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Text(
@@ -116,6 +112,8 @@ class RoomDetailPage extends StatelessWidget {
   }
 
   Widget _buildRoomWidgets(BuildContext context, Room room) {
+    List<int> bookedRooms = room.bookedRooms.map((e) => int.tryParse(e.toString()) ?? -1).toList();
+
     return Expanded(
       child: GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -125,19 +123,25 @@ class RoomDetailPage extends StatelessWidget {
         ),
         itemCount: room.numRooms,
         itemBuilder: (context, index) {
-          bool isFull = room.full > 0;
+          int roomNumber = index + 1;
+          bool isBooked = bookedRooms.contains(roomNumber);
+
           return GestureDetector(
             onTap: () {
-              _showRoomDetails(context, room);
+              if (isBooked) {
+                _showFullRoomDialog(context); // Show message if room is full
+              } else {
+                _showRoomBookingDialog(context, room, roomNumber);
+              }
             },
             child: Container(
               decoration: BoxDecoration(
-                color: isFull ? Colors.red[300] : Colors.green[300],
+                color: isBooked ? Colors.red[300] : Colors.green[300],
                 borderRadius: BorderRadius.circular(8),
               ),
               alignment: Alignment.center,
               child: Text(
-                'Room ${index + 1}', // Example room number
+                'Room $roomNumber',
                 style: TextStyle(color: Colors.white, fontSize: 18),
               ),
             ),
@@ -147,28 +151,63 @@ class RoomDetailPage extends StatelessWidget {
     );
   }
 
-  void _showRoomDetails(BuildContext context, Room room) {
+  void _showFullRoomDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Room Details'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Status: ${room.full > 0 ? 'Full' : 'Available'}'),
-              SizedBox(height: 10),
-              Text(
-                  'Occupants: ${room.empty}'), // Modify based on actual occupant data if available
-              SizedBox(height: 10),
-              Text('Description: ${room.description}'),
-            ],
-          ),
+          title: Text('Room Full'),
+          content: Text('Oops, this room is currently full or already booked.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showRoomBookingDialog(BuildContext context, Room room, int roomNumber) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Booking'),
+          content: Text('Do you want to book Room $roomNumber?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  print('Booking room for userId: ${user.uid}'); // Debug: print userId
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BookRoomPage(
+                        userId: user.uid, // Pass the current user's ID
+                        hostelId: hostelId,
+                        roomTypeId: roomId,
+                        roomNumber: roomNumber, 
+                        roomId: roomId,
+                      ),
+                    ),
+                  );
+                } else {
+                  print('User is not authenticated'); // Debug: user not authenticated
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('You need to be logged in to book a room.')),
+                  );
+                }
+              },
+              child: Text('Book Now'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(), // Close the dialog
+              child: Text('Cancel'),
             ),
           ],
         );
