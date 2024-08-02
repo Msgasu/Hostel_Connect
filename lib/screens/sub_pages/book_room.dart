@@ -170,13 +170,13 @@ class _BookRoomPageState extends State<BookRoomPage> {
                         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       ),
                       readOnly: true,
-                      onTap: ()  {
-                        DateTime? selectedDate = showDatePicker(
+                      onTap: () async {
+                        DateTime? selectedDate = await showDatePicker(
                           context: context,
                           initialDate: DateTime.now(),
                           firstDate: DateTime(2000),
                           lastDate: DateTime(2101),
-                        ) as DateTime?;
+                        );
                         if (selectedDate != null && selectedDate != _selectedPaymentDate) {
                           setState(() {
                             _selectedPaymentDate = selectedDate;
@@ -217,10 +217,10 @@ class _BookRoomPageState extends State<BookRoomPage> {
                       child: ElevatedButton(
                         onPressed: _agreeToTerms ? _bookRoom : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
+                          backgroundColor: Color.fromARGB(255, 172, 73, 33),
                           padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(30),
                           ),
                         ),
                         child: _isLoading

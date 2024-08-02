@@ -136,6 +136,78 @@ class _BookedRoomsPageState extends State<BookedRoomsPage> {
     }
   }
 
+  Future<void> _updateBooking(String bookingId) async {
+    final paymentDateController = TextEditingController();
+    final paymentMethodController = TextEditingController();
+    final contactController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Update Booking'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: paymentDateController,
+                decoration: InputDecoration(labelText: 'Payment Date (YYYY-MM-DD)'),
+                keyboardType: TextInputType.datetime,
+              ),
+              TextField(
+                controller: paymentMethodController,
+                decoration: InputDecoration(labelText: 'Payment Method'),
+              ),
+              TextField(
+                controller: contactController,
+                decoration: InputDecoration(labelText: 'Contact Information'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                try {
+                  final paymentDate = DateTime.parse(paymentDateController.text);
+                  final paymentMethod = paymentMethodController.text;
+                  final contact = contactController.text;
+
+                  final updatedData = {
+                    'paymentDate': paymentDate,
+                    'paymentMethod': paymentMethod,
+                    'contact': contact,
+                  };
+
+                  await FirebaseFirestore.instance
+                      .collection('bookings')
+                      .doc(bookingId)
+                      .update(updatedData);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Booking updated successfully')),
+                  );
+                } catch (e) {
+                  print('Error updating booking: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to update booking: $e')),
+                  );
+                }
+              },
+              child: Text('Update'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -213,7 +285,7 @@ class _BookedRoomsPageState extends State<BookedRoomsPage> {
                       final bookingsWithHostelName = futureSnapshot.data ?? [];
 
                       return ListView.builder(
-                        shrinkWrap: true, // Use shrinkWrap to fit content
+                        shrinkWrap: true,
                         itemCount: bookingsWithHostelName.length,
                         itemBuilder: (context, index) {
                           final booking = bookingsWithHostelName[index];
@@ -226,20 +298,25 @@ class _BookedRoomsPageState extends State<BookedRoomsPage> {
                           final timestamp = booking['timestamp'];
 
                           return Card(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 16),
+                            margin: EdgeInsets.all(10),
                             child: ListTile(
-                              title: Text(hostelName),
+                              title: Text('$hostelName - Room $roomNumber'),
                               subtitle: Text(
-                                'Room Number: $roomNumber\n'
-                                'Room Type: $roomType\n'
-                                'Payment Option: $paymentOption\n'
-                                'Payment Date: ${paymentDate.toLocal()}\n'
-                                'Date Booked: ${timestamp.toLocal()}',
-                              ),
-                              trailing: IconButton(
-                                icon: Icon(Icons.delete),
-                                onPressed: () => _deleteBooking(bookingId),
+                                  'Room Type: $roomType\nPayment Option: $paymentOption\nPayment Date: ${paymentDate.toLocal()}'),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit,
+                                        color: Color.fromARGB(255, 200, 133, 90)),
+                                    onPressed: () => _updateBooking(bookingId),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete,
+                                        color: Color.fromARGB(255, 172, 73, 33)),
+                                    onPressed: () => _deleteBooking(bookingId),
+                                  ),
+                                ],
                               ),
                             ),
                           );

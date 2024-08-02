@@ -4,8 +4,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:final_project/models/hostel_model.dart';
 import 'package:final_project/models/room_model.dart';
 import 'package:final_project/screens/sub_pages/room_details.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart'; // Import phone caller package
-import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts package
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HostelDetailPage extends StatelessWidget {
   final String hostelId;
@@ -68,7 +69,7 @@ class HostelDetailPage extends StatelessWidget {
             actions: [
               IconButton(
                 icon: Icon(Icons.favorite_border, color: Colors.black),
-                onPressed: () {},
+                onPressed: () => _addToWishlist(context, hostel),
               ),
             ],
           ),
@@ -147,6 +148,24 @@ class HostelDetailPage extends StatelessWidget {
     );
   }
 
+  void _addToWishlist(BuildContext context, Hostel hostel) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        await FirebaseFirestore.instance.collection('wishlists').doc(user.uid).collection('items').doc(hostel.id).set({
+          'name': hostel.name,
+          'imageUrl': hostel.imageUrl,
+        });
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added to Wishlist')));
+      } catch (e) {
+        print('Error adding to wishlist: $e');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add to Wishlist')));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('You need to be logged in to add to Wishlist')));
+    }
+  }
+
   Widget _buildManagerDetails(Hostel hostel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,7 +186,7 @@ class HostelDetailPage extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          Icon(icon, size: 40, color: Color.fromARGB(255, 172, 73, 33)), // Icon color
+          Icon(icon, size: 40, color: Color.fromARGB(255, 172, 73, 33)),
           SizedBox(width: 16),
           Expanded(child: Text(text, style: GoogleFonts.lato(fontSize: 16))),
         ],
@@ -213,16 +232,16 @@ class RoomTypeIcons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      spacing: 16.0, // Horizontal spacing between icons
-      runSpacing: 16.0, // Vertical spacing between rows
+      spacing: 16.0, 
+      runSpacing: 16.0, 
       children: rooms.map((roomDoc) {
         final room = Room.fromFirestore(roomDoc);
         return RoomTypeIcon(
-          icon: Icons.single_bed, // Example icon; adjust as needed
-          label: room.type, // Assuming 'type' or similar property exists
+          icon: Icons.single_bed, 
+          label: room.type, 
           page: RoomDetailPage(
             roomId: roomDoc.id, 
-            hostelId: hostelId,  // Pass hostelId to RoomDetailPage
+            hostelId: hostelId,  
           ),
         );
       }).toList(),
@@ -252,7 +271,7 @@ class RoomTypeIcon extends StatelessWidget {
       },
       child: Column(
         children: [
-          Icon(icon, size: 40, color: Color.fromARGB(255, 172, 73, 33)), // Icon color
+          Icon(icon, size: 40, color: Color.fromARGB(255, 172, 73, 33)),
           SizedBox(height: 8),
           Text(
             label,

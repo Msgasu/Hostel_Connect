@@ -17,7 +17,7 @@ class AuthService {
     required String firstName,
     required String lastName,
     required String gender,
-    required String contact,
+    // required String contact,
   }) async {
     if (!_isValidEmail(email)) {
       _showSnackBar(context, 'Invalid email format.');
@@ -40,7 +40,7 @@ class AuthService {
         'firstName': firstName,
         'lastName': lastName,
         'gender': gender,
-        'contact': contact,
+        // 'contact': contact,
         'uid': uid,
       });
 

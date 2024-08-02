@@ -17,7 +17,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _contactController = TextEditingController();
+  // final TextEditingController _contactController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
@@ -28,65 +28,97 @@ class _SignUpPageState extends State<SignUpPage> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
-    _contactController.dispose();
+/// The above code is likely written in Dart and it is calling the `dispose()` method on the
+/// `_contactController` object. This method is commonly used to release resources or perform cleanup
+/// operations when an object is no longer needed.
+    // _contactController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: true,
-      bottomNavigationBar: _signin(context),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        toolbarHeight: 50,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                Center(
-                  child: Text(
-                    'Register Account',
-                    style: GoogleFonts.raleway(
-                      textStyle: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 32,
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.white,
+    resizeToAvoidBottomInset: true,
+    bottomNavigationBar: _signin(context),
+    appBar: AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      toolbarHeight: 50,
+    ),
+    body: SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Form(
+          key: _formKey,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              bool isWide = constraints.maxWidth > 600;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Image.asset(
+                        'assets/splash.jpg',
+                        width: 60, // Adjust size as needed
+                        height: 60,
                       ),
-                    ),
+                      const SizedBox(width: 16),
+                      Text(
+                        'Register Account',
+                        style: GoogleFonts.poppins(
+                          textStyle: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 24,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 20),
-                _firstName(),
-                const SizedBox(height: 16),
-                _lastName(),
-                const SizedBox(height: 16),
-                _gender(),
-                const SizedBox(height: 16),
-                _emailAddress(),
-                const SizedBox(height: 16),
-                _contactNumber(),
-                const SizedBox(height: 20),
-                _password(),
-                const SizedBox(height: 20),
-                _confirmPassword(),
-                const SizedBox(height: 50),
-                _signup(context),
-              ],
-            ),
+                  const SizedBox(height: 20),
+                  isWide
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(child: _firstName()),
+                            const SizedBox(width: 16),
+                            Expanded(child: _lastName()),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            _firstName(),
+                            const SizedBox(height: 16),
+                            _lastName(),
+                          ],
+                        ),
+                  const SizedBox(height: 16),
+                  _gender(),
+                  const SizedBox(height: 16),
+                  _emailAddress(),
+                  const SizedBox(height: 16),
+                  // _contactNumber(),
+                  // const SizedBox(height: 20),
+                  _password(),
+                  const SizedBox(height: 20),
+                  _confirmPassword(),
+                  const SizedBox(height: 50),
+                  _signup(context),
+                ],
+              );
+            },
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _firstName() {
     return Column(
@@ -94,7 +126,7 @@ class _SignUpPageState extends State<SignUpPage> {
       children: [
         Text(
           'First Name',
-          style: GoogleFonts.raleway(
+          style: GoogleFonts.poppins(
             textStyle: const TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.normal,
@@ -136,7 +168,7 @@ class _SignUpPageState extends State<SignUpPage> {
       children: [
         Text(
           'Last Name',
-          style: GoogleFonts.raleway(
+          style: GoogleFonts.poppins(
             textStyle: const TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.normal,
@@ -178,7 +210,7 @@ class _SignUpPageState extends State<SignUpPage> {
       children: [
         Text(
           'Gender',
-          style: GoogleFonts.raleway(
+          style: GoogleFonts.poppins(
             textStyle: const TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.normal,
@@ -227,7 +259,7 @@ class _SignUpPageState extends State<SignUpPage> {
       children: [
         Text(
           'Email Address',
-          style: GoogleFonts.raleway(
+          style: GoogleFonts.poppins(
             textStyle: const TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.normal,
@@ -267,52 +299,52 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _contactNumber() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Contact Number',
-          style: GoogleFonts.raleway(
-            textStyle: const TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.normal,
-              fontSize: 16,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _contactController,
-          decoration: InputDecoration(
-            filled: true,
-            hintText: '+2334567890',
-            hintStyle: const TextStyle(
-              color: Color(0xff6A6A6A),
-              fontWeight: FontWeight.normal,
-              fontSize: 14,
-            ),
-            fillColor: const Color(0xffF7F7F9),
-            border: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-          keyboardType: TextInputType.phone,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter your contact number';
-            }
-            final RegExp phoneRegExp = RegExp(r'^\+?[0-9]{10,15}$');
-            if (!phoneRegExp.hasMatch(value)) {
-              return 'Please enter a valid contact number';
-            }
-            return null;
-          },
-        ),
-      ],
-    );
-  }
+  // Widget _contactNumber() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Text(
+  //         'Contact Number',
+  //         style: GoogleFonts.poppins(
+  //           textStyle: const TextStyle(
+  //             color: Colors.black,
+  //             fontWeight: FontWeight.normal,
+  //             fontSize: 16,
+  //           ),
+  //         ),
+  //       ),
+  //       const SizedBox(height: 16),
+  //       TextFormField(
+  //         controller: _contactController,
+  //         decoration: InputDecoration(
+  //           filled: true,
+  //           hintText: '+2334567890',
+  //           hintStyle: const TextStyle(
+  //             color: Color(0xff6A6A6A),
+  //             fontWeight: FontWeight.normal,
+  //             fontSize: 14,
+  //           ),
+  //           fillColor: const Color(0xffF7F7F9),
+  //           border: OutlineInputBorder(
+  //             borderSide: BorderSide.none,
+  //             borderRadius: BorderRadius.circular(14),
+  //           ),
+  //         ),
+  //         keyboardType: TextInputType.phone,
+  //         validator: (value) {
+  //           if (value == null || value.isEmpty) {
+  //             return 'Please enter your contact number';
+  //           }
+  //           final RegExp phoneRegExp = RegExp(r'^\+?[1-9]\d{1,14}$');
+  //           if (!phoneRegExp.hasMatch(value)) {
+  //             return 'Please enter a valid contact number';
+  //           }
+  //           return null;
+  //         },
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _password() {
     return Column(
@@ -320,7 +352,7 @@ class _SignUpPageState extends State<SignUpPage> {
       children: [
         Text(
           'Password',
-          style: GoogleFonts.raleway(
+          style: GoogleFonts.poppins(
             textStyle: const TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.normal,
@@ -331,10 +363,9 @@ class _SignUpPageState extends State<SignUpPage> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _passwordController,
-          obscureText: true,
           decoration: InputDecoration(
             filled: true,
-            hintText: 'Enter your password',
+            hintText: '••••••••',
             hintStyle: const TextStyle(
               color: Color(0xff6A6A6A),
               fontWeight: FontWeight.normal,
@@ -346,6 +377,7 @@ class _SignUpPageState extends State<SignUpPage> {
               borderRadius: BorderRadius.circular(14),
             ),
           ),
+          obscureText: true,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter your password';
@@ -363,7 +395,7 @@ class _SignUpPageState extends State<SignUpPage> {
       children: [
         Text(
           'Confirm Password',
-          style: GoogleFonts.raleway(
+          style: GoogleFonts.poppins(
             textStyle: const TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.normal,
@@ -374,10 +406,9 @@ class _SignUpPageState extends State<SignUpPage> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _confirmPasswordController,
-          obscureText: true,
           decoration: InputDecoration(
             filled: true,
-            hintText: 'Re-enter your password',
+            hintText: '••••••••',
             hintStyle: const TextStyle(
               color: Color(0xff6A6A6A),
               fontWeight: FontWeight.normal,
@@ -389,6 +420,7 @@ class _SignUpPageState extends State<SignUpPage> {
               borderRadius: BorderRadius.circular(14),
             ),
           ),
+          obscureText: true,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please confirm your password';
@@ -403,12 +435,12 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
- Widget _signup(BuildContext context) {
+Widget _signup(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xff0D6EFD),
+        backgroundColor: const Color.fromARGB(255, 172, 73, 33),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(30),
         ),
         minimumSize: const Size(double.infinity, 60),
         elevation: 0,
@@ -422,7 +454,7 @@ class _SignUpPageState extends State<SignUpPage> {
             firstName: _firstNameController.text,
             lastName: _lastNameController.text,
             gender: _selectedGender,
-            contact: _contactController.text,
+            // contact: _contactController.text,
           );
         } else {
           // Show error message
@@ -431,41 +463,46 @@ class _SignUpPageState extends State<SignUpPage> {
           );
         }
       },
-      child: const Text("Sign Up"),
+      child: const Text(
+  "Sign Up",
+  style: TextStyle(
+    color: Colors.black, // Set the text color to black
+  ),
+),
+
     );
   }
+
+
   Widget _signin(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 12),
       child: RichText(
         text: TextSpan(
           children: [
             TextSpan(
               text: 'Already have an account? ',
-              style: GoogleFonts.raleway(
+              style: GoogleFonts.poppins(
                 textStyle: const TextStyle(
-                  color: Color(0xff6A6A6A),
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14,
+                  color: Colors.black,
+                  fontSize: 16,
                 ),
               ),
             ),
             TextSpan(
               text: 'Sign In',
-              style: GoogleFonts.raleway(
+              style: GoogleFonts.poppins(
                 textStyle: const TextStyle(
-                  color: Color(0xff0047AB),
+                  color:  Color.fromARGB(255, 172, 73, 33),
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  fontSize: 14,
                 ),
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => LoginPage(),
-                    ),
+                    MaterialPageRoute(builder: (context) => LoginPage()),
                   );
                 },
             ),

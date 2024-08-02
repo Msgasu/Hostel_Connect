@@ -47,18 +47,44 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //   backgroundColor: Colors.white,
+      //   elevation: 0,
+      //   flexibleSpace: Center(
+      //     child: Image.asset(
+      //       'assets/logo.png', // Replace with your logo path
+      //       height: 50, // Adjust height as needed
+      //     ),
+      //   ),
+      //   actions: [
+      //     IconButton(
+      //       icon: Icon(Icons.info_outline, color: Colors.black87),
+      //       onPressed: () {
+      //         // Handle icon press here
+      //       },
+      //     ),
+      //   ],
+      // ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
             physics: BouncingScrollPhysics(),
-            child: Form( // Wrap the form fields in a Form widget
-              key: _formKey, // Set the key for the Form
+            child: Form(
+              key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.05), // 5% of available free space
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.05), // 5% of available free space
+
+                  // Logo
+                  Center(
+                    child: Image.asset(
+                      'assets/splash.jpg', // Replace with your logo path
+                      height: 100, // Adjust height as needed
+                    ),
+                  ),
+                  SizedBox(height: 16),
 
                   // Welcome back text (centered)
                   Center(
@@ -66,7 +92,8 @@ class _LoginPageState extends State<LoginPage> {
                       'Welcome back!',
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
-                        fontSize: 40,
+                        fontSize: 36,
+                        color: Colors.black87,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -77,10 +104,11 @@ class _LoginPageState extends State<LoginPage> {
                   // Prompt (Login to explore hostel options)
                   Center(
                     child: Text(
-                      'Login to explore Hostel options',
+                      'Login to explore hostel options',
                       style: GoogleFonts.poppins(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey[700],
                       ),
                     ),
                   ),
@@ -94,12 +122,12 @@ class _LoginPageState extends State<LoginPage> {
                         filled: true,
                         fillColor: Color(0xFFFBFBFB),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14.0),
-                          borderSide: BorderSide(color: Color(0xFFF3F3F3)),
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: BorderSide.none,
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14.0),
-                          borderSide: BorderSide(color: Color(0xFFF2994A)),
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: BorderSide(color: Color.fromARGB(255, 172, 73, 33), width: 2),
                         ),
                       ),
                     ),
@@ -110,8 +138,9 @@ class _LoginPageState extends State<LoginPage> {
                         Text(
                           'Email',
                           style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
                           ),
                         ),
                         SizedBox(height: 8),
@@ -121,6 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                           controller: _emailController,
                           decoration: InputDecoration(
                             hintText: 'Enter your email',
+                            prefixIcon: Icon(Icons.email, color: Colors.grey[600]), // Add an email icon
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -136,8 +166,9 @@ class _LoginPageState extends State<LoginPage> {
                         Text(
                           'Password',
                           style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
                           ),
                         ),
                         SizedBox(height: 8),
@@ -147,11 +178,11 @@ class _LoginPageState extends State<LoginPage> {
                           controller: _passwordController,
                           decoration: InputDecoration(
                             hintText: 'Enter your password',
+                            prefixIcon: Icon(Icons.lock, color: Colors.grey[600]), // Add a lock icon
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
+                                _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                                color: Colors.grey[600],
                               ),
                               onPressed: () {
                                 setState(() {
@@ -168,25 +199,6 @@ class _LoginPageState extends State<LoginPage> {
                             return null;
                           },
                         ),
-
-                        SizedBox(height: 8),
-
-                        // Forgot password button
-                        Align(
-                          alignment: Alignment.center,
-                          child: TextButton(
-                            onPressed: () {
-                              // Implement forgot password functionality
-                            },
-                            child: Text(
-                              'Forgot password?',
-                              style: GoogleFonts.poppins(
-                                color: Color(0xFF3D80DE),
-                              ),
-                            ),
-                          ),
-                        ),
-
                         SizedBox(height: 16),
 
                         // Log in button
@@ -196,11 +208,10 @@ class _LoginPageState extends State<LoginPage> {
                               : ElevatedButton(
                                   onPressed: _login,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xff0047AB), // Primary color for the button
+                                    backgroundColor: Color.fromARGB(255, 172, 73, 33), // Primary color for the button
                                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(35.0),
-                                      side: BorderSide(color: Color(0xFFB9B9C4), width: 2),
+                                      borderRadius: BorderRadius.circular(30.0),
                                     ),
                                     elevation: 5,
                                     shadowColor: Colors.grey,
@@ -222,7 +233,13 @@ class _LoginPageState extends State<LoginPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Don't have an account? "),
+                            Text(
+                              "Don't have an account? ",
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                            ),
                             InkWell(
                               onTap: () {
                                 Navigator.push(
@@ -235,7 +252,7 @@ class _LoginPageState extends State<LoginPage> {
                               child: Text(
                                 'Sign up',
                                 style: GoogleFonts.poppins(
-                                  color: Colors.blue,
+                                  color: Color.fromARGB(255, 172, 73, 33),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

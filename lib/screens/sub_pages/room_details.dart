@@ -15,11 +15,11 @@ class RoomDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Room Details'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        title: Text('Room Details', style: TextStyle(color: Color.fromARGB(255, 27, 27, 27))),
+        backgroundColor: Color.fromARGB(255, 255, 253, 253), // Wine color
+        elevation: 4,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Color.fromARGB(255, 0, 0, 0)),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -84,16 +84,34 @@ class RoomDetailPage extends StatelessWidget {
       options: CarouselOptions(
         height: 200,
         autoPlay: true,
+        autoPlayInterval: Duration(seconds: 4),
         enlargeCenterPage: true,
         viewportFraction: 1.0,
+        aspectRatio: 16 / 9,
+        enableInfiniteScroll: true,
       ),
       items: room.imageUrls.map((imageUrl) {
         return Builder(
           builder: (BuildContext context) {
-            return Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
+            return Container(
               width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                ),
+              ),
             );
           },
         );
@@ -102,11 +120,25 @@ class RoomDetailPage extends StatelessWidget {
   }
 
   Widget _buildRoomCount(int totalRooms, int availableRooms) {
-    return Padding(
+    return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Text(
-        'Total Rooms: $totalRooms | Available Rooms: $availableRooms',
-        style: TextStyle(fontSize: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(
+          'Total Rooms: $totalRooms \nAvailable Rooms: $availableRooms',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 114, 23, 23)),
+        ),
       ),
     );
   }
@@ -137,12 +169,19 @@ class RoomDetailPage extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 color: isBooked ? Colors.red[300] : Colors.green[300],
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 6,
+                    offset: Offset(0, 2),
+                  ),
+                ],
               ),
               alignment: Alignment.center,
               child: Text(
                 'Room $roomNumber',
-                style: TextStyle(color: Colors.white, fontSize: 18),
+                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
           );
@@ -156,7 +195,7 @@ class RoomDetailPage extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Room Full'),
+          title: Text('Room Full', style: TextStyle(fontWeight: FontWeight.bold)),
           content: Text('Oops, this room is currently full or already booked.'),
           actions: [
             TextButton(
@@ -174,7 +213,7 @@ class RoomDetailPage extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm Booking'),
+          title: Text('Confirm Booking', style: TextStyle(fontWeight: FontWeight.bold)),
           content: Text('Do you want to book Room $roomNumber?'),
           actions: [
             TextButton(
@@ -183,7 +222,6 @@ class RoomDetailPage extends StatelessWidget {
 
                 final user = FirebaseAuth.instance.currentUser;
                 if (user != null) {
-                  print('Booking room for userId: ${user.uid}'); // Debug: print userId
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -197,13 +235,12 @@ class RoomDetailPage extends StatelessWidget {
                     ),
                   );
                 } else {
-                  print('User is not authenticated'); // Debug: user not authenticated
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('You need to be logged in to book a room.')),
                   );
                 }
               },
-              child: Text('Book Now'),
+              child: Text('Book Now', style: TextStyle(color: Color.fromARGB(255, 114, 23, 23))),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(), // Close the dialog
